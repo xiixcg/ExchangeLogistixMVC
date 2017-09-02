@@ -1,0 +1,82 @@
+﻿@model ExchangeLogistixMVC.Models.Trailer
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Trailer</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PhoneNumber)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PhoneNumber)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ChasisSize)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ChasisSize)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LoadSize)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LoadSize)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NextLoadLocation)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NextLoadLocation)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CurrentLoadDestination)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CurrentLoadDestination)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CurrentLoadETA)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CurrentLoadETA)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
