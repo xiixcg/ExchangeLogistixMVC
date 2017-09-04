@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using ExchangeLogistixMVC.Models;
+using Microsoft.AspNet.Identity;
 
 namespace ExchangeLogistixMVC.Controllers
 {
@@ -17,6 +18,7 @@ namespace ExchangeLogistixMVC.Controllers
         // GET: Trailer
         public ActionResult Index()
         {
+			var oCurrentUserID = User.Identity.GetUserId();
             return View(db.Trailer.ToList());
         }
 
