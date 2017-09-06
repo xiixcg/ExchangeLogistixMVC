@@ -194,6 +194,10 @@
     <Compile Include="ApplicationDbContextMigrations\201709032321131_Initial.Designer.cs">
       <DependentUpon>201709032321131_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="ApplicationDbContextMigrations\201709042221251_AddedPhoneNumberForRegister.cs" />
+    <Compile Include="ApplicationDbContextMigrations\201709042221251_AddedPhoneNumberForRegister.Designer.cs">
+      <DependentUpon>201709042221251_AddedPhoneNumberForRegister.cs</DependentUpon>
+    </Compile>
     <Compile Include="ApplicationDbContextMigrations\Configuration.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -217,6 +221,14 @@
     <Compile Include="TrailerDBContextMigrations\201709032330466_Initial.cs" />
     <Compile Include="TrailerDBContextMigrations\201709032330466_Initial.Designer.cs">
       <DependentUpon>201709032330466_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TrailerDBContextMigrations\201709040700088_AddedUserID.cs" />
+    <Compile Include="TrailerDBContextMigrations\201709040700088_AddedUserID.Designer.cs">
+      <DependentUpon>201709040700088_AddedUserID.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TrailerDBContextMigrations\201709042240045_PossibleChangeInPhoneNumber.cs" />
+    <Compile Include="TrailerDBContextMigrations\201709042240045_PossibleChangeInPhoneNumber.Designer.cs">
+      <DependentUpon>201709042240045_PossibleChangeInPhoneNumber.cs</DependentUpon>
     </Compile>
     <Compile Include="TrailerDBContextMigrations\Configuration.cs" />
   </ItemGroup>
@@ -266,11 +278,9 @@
     <Content Include="Views\Account\ResetPasswordConfirmation.cshtml" />
     <Content Include="Views\Account\SendCode.cshtml" />
     <Content Include="Views\Account\VerifyCode.cshtml" />
-    <Content Include="Views\Manage\AddPhoneNumber.cshtml" />
     <Content Include="Views\Manage\ChangePassword.cshtml" />
     <Content Include="Views\Manage\Index.cshtml" />
     <Content Include="Views\Manage\SetPassword.cshtml" />
-    <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Trailer\Create.cshtml" />
@@ -295,8 +305,17 @@
     <EmbeddedResource Include="ApplicationDbContextMigrations\201709032321131_Initial.resx">
       <DependentUpon>201709032321131_Initial.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ApplicationDbContextMigrations\201709042221251_AddedPhoneNumberForRegister.resx">
+      <DependentUpon>201709042221251_AddedPhoneNumberForRegister.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TrailerDBContextMigrations\201709032330466_Initial.resx">
       <DependentUpon>201709032330466_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrailerDBContextMigrations\201709040700088_AddedUserID.resx">
+      <DependentUpon>201709040700088_AddedUserID.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrailerDBContextMigrations\201709042240045_PossibleChangeInPhoneNumber.resx">
+      <DependentUpon>201709042240045_PossibleChangeInPhoneNumber.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -8,18 +8,18 @@ using System.Web;
 using System.Web.Mvc;
 using ExchangeLogistixMVC.Models;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace ExchangeLogistixMVC.Controllers
 {
     public class TrailerController : Controller
     {
-        private TrailerDBContext db = new TrailerDBContext();
+        private TrailerDBContext oDB = new TrailerDBContext();
 
         // GET: Trailer
         public ActionResult Index()
         {
-			var oCurrentUserID = User.Identity.GetUserId();
-            return View(db.Trailer.ToList());
+            return View(oDB.Trailer.ToList());
         }
 
         // GET: Trailer/Details/5
@@ -29,7 +29,7 @@ namespace ExchangeLogistixMVC.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Trailer trailer = db.Trailer.Find(id);
+            Trailer trailer = oDB.Trailer.Find(id);
             if (trailer == null)
             {
                 return HttpNotFound();
@@ -48,16 +48,30 @@ namespace ExchangeLogistixMVC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,FirstName,LastName,PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer trailer)
+        public ActionResult Create([Bind(Include = "Id,PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer poTrailer)
         {
-            if (ModelState.IsValid)
+			string sUserID = User.Identity.GetUserId();
+			var oManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
+			var oCurrentUser = oManager.FindById(sUserID);
+
+			if (!sUserID.Equals(null) && !sUserID.Equals(""))
+			{
+				poTrailer.UserID = sUserID;
+			}
+
+			if (!oCurrentUser.Equals(null))
+			{
+				poTrailer.PhoneNumber = oCurrentUser.PhoneNumber;
+			}
+
+			if (ModelState.IsValid)
             {
-                db.Trailer.Add(trailer);
-                db.SaveChanges();
+				oDB.Trailer.Add(poTrailer);
+				oDB.SaveChanges();
                 return RedirectToAction("Index");
             }
 
-            return View(trailer);
+            return View(poTrailer);
         }
 
         // GET: Trailer/Edit/5
@@ -67,7 +81,7 @@ namespace ExchangeLogistixMVC.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Trailer trailer = db.Trailer.Find(id);
+            Trailer trailer = oDB.Trailer.Find(id);
             if (trailer == null)
             {
                 return HttpNotFound();
@@ -80,12 +94,12 @@ namespace ExchangeLogistixMVC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,FirstName,LastName,PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer trailer)
+        public ActionResult Edit([Bind(Include = "Id,PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer trailer)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(trailer).State = EntityState.Modified;
-                db.SaveChanges();
+				oDB.Entry(trailer).State = EntityState.Modified;
+				oDB.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(trailer);
@@ -98,7 +112,7 @@ namespace ExchangeLogistixMVC.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Trailer trailer = db.Trailer.Find(id);
+            Trailer trailer = oDB.Trailer.Find(id);
             if (trailer == null)
             {
                 return HttpNotFound();
@@ -111,9 +125,9 @@ namespace ExchangeLogistixMVC.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Trailer trailer = db.Trailer.Find(id);
-            db.Trailer.Remove(trailer);
-            db.SaveChanges();
+            Trailer trailer = oDB.Trailer.Find(id);
+			oDB.Trailer.Remove(trailer);
+			oDB.SaveChanges();
             return RedirectToAction("Index");
         }
 
@@ -121,7 +135,7 @@ namespace ExchangeLogistixMVC.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+				oDB.Dispose();
             }
             base.Dispose(disposing);
         }

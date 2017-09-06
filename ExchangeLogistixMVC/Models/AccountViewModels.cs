@@ -75,6 +75,11 @@ namespace ExchangeLogistixMVC.Models
 		[Required]
 		[Display(Name = "Last Name")]
 		public string LastName { get; set; }
+
+		[DataType(DataType.PhoneNumber)]
+		[Required]
+		[Display(Name = "Phone Number")]
+		public string PhoneNumber { get; set; }
 	}
 
     public class ResetPasswordViewModel
