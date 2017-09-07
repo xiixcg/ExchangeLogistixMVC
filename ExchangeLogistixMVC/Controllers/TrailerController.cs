@@ -49,19 +49,23 @@ namespace ExchangeLogistixMVC.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Id,PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer poTrailer)
-        {
+		{
 			string sUserID = User.Identity.GetUserId();
-			var oManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
-			var oCurrentUser = oManager.FindById(sUserID);
 
 			if (!sUserID.Equals(null) && !sUserID.Equals(""))
 			{
 				poTrailer.UserID = sUserID;
 			}
 
-			if (!oCurrentUser.Equals(null))
+			if (poTrailer.PhoneNumber.Equals(null) && poTrailer.PhoneNumber.Equals(""))
 			{
-				poTrailer.PhoneNumber = oCurrentUser.PhoneNumber;
+				var oManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
+				var oCurrentUser = oManager.FindById(sUserID);
+
+				if (!oCurrentUser.Equals(null))
+				{
+					poTrailer.PhoneNumber = oCurrentUser.PhoneNumber;
+				}
 			}
 
 			if (ModelState.IsValid)

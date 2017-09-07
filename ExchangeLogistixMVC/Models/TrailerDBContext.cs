@@ -8,7 +8,7 @@ namespace ExchangeLogistixMVC.Models
 {
 	public class TrailerDBContext : DbContext
 	{
-		public TrailerDBContext() : base("ConnectTrailers")
+		public TrailerDBContext() : base("TrailersData")
 		{
 
 		}

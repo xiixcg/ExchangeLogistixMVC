@@ -12,7 +12,8 @@ namespace ExchangeLogistixMVC.TrailerDBContextMigrations
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        PhoneNumber = c.String(nullable: false),
+                        UserID = c.String(),
+                        PhoneNumber = c.String(),
                         ChasisSize = c.Int(nullable: false),
                         LoadSize = c.Int(nullable: false),
                         NextLoadLocation = c.String(nullable: false),

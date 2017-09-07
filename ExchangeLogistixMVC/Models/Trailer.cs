@@ -9,10 +9,8 @@ namespace ExchangeLogistixMVC.Models
 	public class Trailer
 	{
 		public int Id { get; set; }
-		[Required]
 		[Display(Name = "User ID")]
 		public string UserID { get; set; }
-		[Required]
 		[Display(Name = "Phone Number")]
 		public string PhoneNumber { get; set; }
 		[Required]

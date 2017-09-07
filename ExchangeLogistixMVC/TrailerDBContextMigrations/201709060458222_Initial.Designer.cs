@@ -7,13 +7,13 @@ namespace ExchangeLogistixMVC.TrailerDBContextMigrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddedUserID : IMigrationMetadata
+    public sealed partial class Initial : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedUserID));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Initial));
         
         string IMigrationMetadata.Id
         {
-            get { return "201709040700088_AddedUserID"; }
+            get { return "201709060458222_Initial"; }
         }
         
         string IMigrationMetadata.Source
