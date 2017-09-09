@@ -1,14 +1,15 @@
-﻿@model IEnumerable<ExchangeLogistixMVC.Models.Trailer>
+﻿@using Microsoft.AspNet.Identity
+@model IEnumerable<ExchangeLogistixMVC.Models.Trailer>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "PastTrailer";
 }
 
-<h2>Index</h2>
-
+<h2>PastTrailer</h2>
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Return to My Trailer", "MyTrailer", new { psID = User.Identity.GetUserId() })
 </p>
+
 <table class="table">
     <tr>
         <th>
@@ -59,8 +60,6 @@
             @Html.DisplayFor(modelItem => item.CurrentLoadETA)
         </td>
         <td>
-            @Html.ActionLink("Match", "Match", new { pnID = item.Id }) |
-            @Html.ActionLink("Edit", "Edit", new { pnID = item.Id }) |
             @Html.ActionLink("Details", "Details", new { pnID = item.Id }) |
             @Html.ActionLink("Delete", "Delete", new { pnID = item.Id })
         </td>

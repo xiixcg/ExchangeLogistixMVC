@@ -6,7 +6,7 @@ using System.Web;
 
 namespace ExchangeLogistixMVC.Models
 {
-	public class Trailer
+	public class Trailer 
 	{
 		public int Id { get; set; }
 		[Display(Name = "User ID")]

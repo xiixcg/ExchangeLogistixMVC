@@ -14,32 +14,45 @@ namespace ExchangeLogistixMVC.Controllers
 {
     public class TrailerController : Controller
     {
-        private TrailerDBContext oDB = new TrailerDBContext();
-
+        private TrailerDBContext oTrailerDB = new TrailerDBContext();
+		
         // GET: Trailer
         public ActionResult Index()
         {
-            return View(oDB.Trailer.ToList());
+			if (!Request.IsAuthenticated)
+			{
+				return RedirectToAction("Login", "Account");
+			}
+
+            return View(oTrailerDB.Trailer.ToList());
         }
 
         // GET: Trailer/Details/5
-        public ActionResult Details(int? id)
+        public ActionResult Details(int? pnID)
         {
-            if (id == null)
+			if (!Request.IsAuthenticated)
+			{
+				return RedirectToAction("Login", "Account");
+			}
+			if (pnID == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Trailer trailer = oDB.Trailer.Find(id);
-            if (trailer == null)
+            Trailer oCurrentTrailer = oTrailerDB.Trailer.Find(pnID);
+            if (oCurrentTrailer == null)
             {
                 return HttpNotFound();
             }
-            return View(trailer);
+            return View(oCurrentTrailer);
         }
 
         // GET: Trailer/Create
         public ActionResult Create()
         {
+			if (!Request.IsAuthenticated)
+			{
+				return RedirectToAction("Login", "Account");
+			}
             return View();
         }
 
@@ -70,27 +83,97 @@ namespace ExchangeLogistixMVC.Controllers
 
 			if (ModelState.IsValid)
             {
-				oDB.Trailer.Add(poTrailer);
-				oDB.SaveChanges();
+				oTrailerDB.Trailer.Add(poTrailer);
+				oTrailerDB.SaveChanges();
                 return RedirectToAction("Index");
             }
 
             return View(poTrailer);
         }
 
-        // GET: Trailer/Edit/5
-        public ActionResult Edit(int? id)
+		//Get: Trailer/MyTrailer
+		public ActionResult MyTrailer(string psID)
+		{
+			if (!Request.IsAuthenticated)
+			{
+				return RedirectToAction("Login", "Account");
+			}
+			if (psID == null || psID == "")
+			{
+				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+			}
+			IEnumerable<Trailer> oTrailerQuery =
+			from oTrailer in oTrailerDB.Trailer.ToList()
+			//where oTrailer.UserID == psID
+			where oTrailer.CurrentLoadETA >= DateTime.Now
+			select oTrailer;
+
+			return View(oTrailerQuery);
+		}
+
+		//Get: Trailer/PastTrailer
+		public ActionResult PastTrailer(string psID)
+		{
+			if (!Request.IsAuthenticated)
+			{
+				return RedirectToAction("Login", "Account");
+			}
+			if (psID == null || psID == "")
+			{
+				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+			}
+			IEnumerable<Trailer> oTrailerQuery =
+			from oTrailer in oTrailerDB.Trailer.ToList()
+				//where oTrailer.UserID == psID
+			where oTrailer.CurrentLoadETA < DateTime.Now
+			select oTrailer;
+
+			return View(oTrailerQuery);
+		}
+
+		//Get: Trailer/Match
+		public ActionResult Match(int? pnID)
+		{
+			if (!Request.IsAuthenticated)
+			{
+				return RedirectToAction("Login", "Account");
+			}
+			if (pnID == null)
+			{
+				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+			}
+			Trailer oCurrentTrailer = oTrailerDB.Trailer.Find(pnID);
+			if (oCurrentTrailer == null)
+			{
+				return HttpNotFound();
+			}
+			IEnumerable<Trailer> oTrailerQuery = 
+			from oTrailer in oTrailerDB.Trailer.ToList() 
+			where oTrailer.NextLoadLocation == oCurrentTrailer.CurrentLoadDestination
+			where oTrailer.CurrentLoadETA == oCurrentTrailer.CurrentLoadETA
+			where oTrailer.UserID != oCurrentTrailer.UserID
+			select oTrailer;
+
+			return View(oTrailerQuery);
+		}
+
+		// GET: Trailer/Edit/5
+		public ActionResult Edit(int? pnID)
         {
-            if (id == null)
+			if (!Request.IsAuthenticated)
+			{
+				return RedirectToAction("Login", "Account");
+			}
+			if (pnID == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Trailer trailer = oDB.Trailer.Find(id);
-            if (trailer == null)
+            Trailer oCurrentTrailer = oTrailerDB.Trailer.Find(pnID);
+            if (oCurrentTrailer == null)
             {
                 return HttpNotFound();
             }
-            return View(trailer);
+            return View(oCurrentTrailer);
         }
 
         // POST: Trailer/Edit/5
@@ -98,50 +181,72 @@ namespace ExchangeLogistixMVC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer trailer)
+        public ActionResult Edit([Bind(Include = "Id,PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer poTrailer)
         {
-            if (ModelState.IsValid)
+			string sUserID = User.Identity.GetUserId();
+
+			if (!sUserID.Equals(null) && !sUserID.Equals(""))
+			{
+				poTrailer.UserID = sUserID;
+			}
+
+			if (poTrailer.PhoneNumber.Equals(null) && poTrailer.PhoneNumber.Equals(""))
+			{
+				var oManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
+				var oCurrentUser = oManager.FindById(sUserID);
+
+				if (!oCurrentUser.Equals(null))
+				{
+					poTrailer.PhoneNumber = oCurrentUser.PhoneNumber;
+				}
+			}
+
+			if (ModelState.IsValid)
             {
-				oDB.Entry(trailer).State = EntityState.Modified;
-				oDB.SaveChanges();
+				oTrailerDB.Entry(poTrailer).State = EntityState.Modified;
+				oTrailerDB.SaveChanges();
                 return RedirectToAction("Index");
             }
-            return View(trailer);
+            return View(poTrailer);
         }
 
         // GET: Trailer/Delete/5
-        public ActionResult Delete(int? id)
+        public ActionResult Delete(int? pnID)
         {
-            if (id == null)
+			if (!Request.IsAuthenticated)
+			{
+				return RedirectToAction("Login", "Account");
+			}
+			if (pnID == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Trailer trailer = oDB.Trailer.Find(id);
-            if (trailer == null)
+            Trailer oCurrentTrailer = oTrailerDB.Trailer.Find(pnID);
+            if (oCurrentTrailer == null)
             {
                 return HttpNotFound();
             }
-            return View(trailer);
+            return View(oCurrentTrailer);
         }
 
         // POST: Trailer/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult DeleteConfirmed(int pnID)
         {
-            Trailer trailer = oDB.Trailer.Find(id);
-			oDB.Trailer.Remove(trailer);
-			oDB.SaveChanges();
+            Trailer oCurrentTrailer = oTrailerDB.Trailer.Find(pnID);
+			oTrailerDB.Trailer.Remove(oCurrentTrailer);
+			oTrailerDB.SaveChanges();
             return RedirectToAction("Index");
         }
 
-        protected override void Dispose(bool disposing)
+        protected override void Dispose(bool pbDisposing)
         {
-            if (disposing)
+            if (pbDisposing)
             {
-				oDB.Dispose();
+				oTrailerDB.Dispose();
             }
-            base.Dispose(disposing);
+            base.Dispose(pbDisposing);
         }
     }
 }
