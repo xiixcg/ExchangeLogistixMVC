@@ -131,8 +131,8 @@ namespace ExchangeLogistixMVC.Controllers
 			return View(oTrailerQuery);
 		}
 
-		//Get: Trailer/Match
-		public ActionResult Match(int? pnID)
+		//Get: Trailer/ShowMatch
+		public ActionResult ShowMatch(int? pnID)
 		{
 			if (!Request.IsAuthenticated)
 			{

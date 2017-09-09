@@ -283,7 +283,7 @@
     <Content Include="Views\Trailer\Edit.cshtml" />
     <Content Include="Views\Trailer\Index.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Trailer\Match.cshtml" />
+    <Content Include="Views\Trailer\ShowMatch.cshtml" />
     <Content Include="Views\Trailer\MyTrailer.cshtml" />
     <Content Include="Views\Trailer\PastTrailer.cshtml" />
   </ItemGroup>

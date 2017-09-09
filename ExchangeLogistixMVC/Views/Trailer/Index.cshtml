@@ -59,7 +59,7 @@
             @Html.DisplayFor(modelItem => item.CurrentLoadETA)
         </td>
         <td>
-            @Html.ActionLink("Match", "Match", new { pnID = item.Id }) |
+            @Html.ActionLink("Match", "ShowMatch", new { pnID = item.Id }) |
             @Html.ActionLink("Edit", "Edit", new { pnID = item.Id }) |
             @Html.ActionLink("Details", "Details", new { pnID = item.Id }) |
             @Html.ActionLink("Delete", "Delete", new { pnID = item.Id })
