@@ -8,9 +8,8 @@ namespace ExchangeLogistixMVC.Models
 {
 	public class Trailer 
 	{
-		public int Id { get; set; }
-		[Display(Name = "User ID")]
-		public string UserID { get; set; }
+		public int TrailerID { get; set; }
+		public string ApplicationUserID { get; set; }
 		[Display(Name = "Phone Number")]
 		public string PhoneNumber { get; set; }
 		[Required]
@@ -28,5 +27,7 @@ namespace ExchangeLogistixMVC.Models
 		[Required]
 		[Display(Name = "Current Load Drop-off Date/Time")]
 		public DateTime CurrentLoadETA { get; set; }
+
+		public virtual ApplicationUser ApplicationUser { get; set; }
 	}
 }

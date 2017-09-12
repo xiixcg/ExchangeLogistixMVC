@@ -14,7 +14,7 @@ namespace ExchangeLogistixMVC.Controllers
 {
     public class TrailerController : Controller
     {
-        private TrailerDBContext oTrailerDB = new TrailerDBContext();
+        private ApplicationDbContext oApplicationDBContext = new ApplicationDbContext();
 		
         // GET: Trailer
         public ActionResult Index()
@@ -24,7 +24,7 @@ namespace ExchangeLogistixMVC.Controllers
 				return RedirectToAction("Login", "Account");
 			}
 
-            return View(oTrailerDB.Trailer.ToList());
+            return View(oApplicationDBContext.Trailers.ToList());
         }
 
         // GET: Trailer/Details/5
@@ -38,7 +38,7 @@ namespace ExchangeLogistixMVC.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Trailer oCurrentTrailer = oTrailerDB.Trailer.Find(pnID);
+            Trailer oCurrentTrailer = oApplicationDBContext.Trailers.Find(pnID);
             if (oCurrentTrailer == null)
             {
                 return HttpNotFound();
@@ -61,19 +61,19 @@ namespace ExchangeLogistixMVC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer poTrailer)
+        public ActionResult Create([Bind(Include = "TrailerID, ApplicationUserID, PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer poTrailer)
 		{
-			string sUserID = User.Identity.GetUserId();
+			//string sUserID = User.Identity.GetUserId();
 
-			if (!sUserID.Equals(null) && !sUserID.Equals(""))
-			{
-				poTrailer.UserID = sUserID;
-			}
+			//if (!sUserID.Equals(null) && !sUserID.Equals(""))
+			//{
+			//	poTrailer.ApplicationUserID = sUserID;
+			//}
 
 			if (poTrailer.PhoneNumber.Equals(null) && poTrailer.PhoneNumber.Equals(""))
 			{
 				var oManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
-				var oCurrentUser = oManager.FindById(sUserID);
+				var oCurrentUser = oManager.FindById(poTrailer.ApplicationUserID);
 
 				if (!oCurrentUser.Equals(null))
 				{
@@ -83,8 +83,8 @@ namespace ExchangeLogistixMVC.Controllers
 
 			if (ModelState.IsValid)
             {
-				oTrailerDB.Trailer.Add(poTrailer);
-				oTrailerDB.SaveChanges();
+				oApplicationDBContext.Trailers.Add(poTrailer);
+				oApplicationDBContext.SaveChanges();
                 return RedirectToAction("Index");
             }
 
@@ -103,7 +103,7 @@ namespace ExchangeLogistixMVC.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 			}
 			IEnumerable<Trailer> oTrailerQuery =
-			from oTrailer in oTrailerDB.Trailer.ToList()
+			from oTrailer in oApplicationDBContext.Trailers.ToList()
 			//where oTrailer.UserID == psID
 			where oTrailer.CurrentLoadETA >= DateTime.Now
 			select oTrailer;
@@ -123,7 +123,7 @@ namespace ExchangeLogistixMVC.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 			}
 			IEnumerable<Trailer> oTrailerQuery =
-			from oTrailer in oTrailerDB.Trailer.ToList()
+			from oTrailer in oApplicationDBContext.Trailers.ToList()
 				//where oTrailer.UserID == psID
 			where oTrailer.CurrentLoadETA < DateTime.Now
 			select oTrailer;
@@ -142,16 +142,16 @@ namespace ExchangeLogistixMVC.Controllers
 			{
 				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 			}
-			Trailer oCurrentTrailer = oTrailerDB.Trailer.Find(pnID);
+			Trailer oCurrentTrailer = oApplicationDBContext.Trailers.Find(pnID);
 			if (oCurrentTrailer == null)
 			{
 				return HttpNotFound();
 			}
 			IEnumerable<Trailer> oTrailerQuery = 
-			from oTrailer in oTrailerDB.Trailer.ToList() 
+			from oTrailer in oApplicationDBContext.Trailers.ToList() 
 			where oTrailer.NextLoadLocation == oCurrentTrailer.CurrentLoadDestination
 			where oTrailer.CurrentLoadETA == oCurrentTrailer.CurrentLoadETA
-			where oTrailer.UserID != oCurrentTrailer.UserID
+			where oTrailer.ApplicationUserID != oCurrentTrailer.ApplicationUserID
 			select oTrailer;
 
 			return View(oTrailerQuery);
@@ -168,7 +168,7 @@ namespace ExchangeLogistixMVC.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Trailer oCurrentTrailer = oTrailerDB.Trailer.Find(pnID);
+            Trailer oCurrentTrailer = oApplicationDBContext.Trailers.Find(pnID);
             if (oCurrentTrailer == null)
             {
                 return HttpNotFound();
@@ -181,19 +181,19 @@ namespace ExchangeLogistixMVC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer poTrailer)
+        public ActionResult Edit([Bind(Include = "TrailerID, ApplicationUserID, PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer poTrailer)
         {
-			string sUserID = User.Identity.GetUserId();
+			//string sUserID = User.Identity.GetUserId();
 
-			if (!sUserID.Equals(null) && !sUserID.Equals(""))
-			{
-				poTrailer.UserID = sUserID;
-			}
+			//if (!sUserID.Equals(null) && !sUserID.Equals(""))
+			//{
+			//	poTrailer.UserID = sUserID;
+			//}
 
 			if (poTrailer.PhoneNumber.Equals(null) && poTrailer.PhoneNumber.Equals(""))
 			{
 				var oManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
-				var oCurrentUser = oManager.FindById(sUserID);
+				var oCurrentUser = oManager.FindById(poTrailer.ApplicationUserID);
 
 				if (!oCurrentUser.Equals(null))
 				{
@@ -203,8 +203,8 @@ namespace ExchangeLogistixMVC.Controllers
 
 			if (ModelState.IsValid)
             {
-				oTrailerDB.Entry(poTrailer).State = EntityState.Modified;
-				oTrailerDB.SaveChanges();
+				oApplicationDBContext.Entry(poTrailer).State = EntityState.Modified;
+				oApplicationDBContext.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(poTrailer);
@@ -221,7 +221,7 @@ namespace ExchangeLogistixMVC.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Trailer oCurrentTrailer = oTrailerDB.Trailer.Find(pnID);
+            Trailer oCurrentTrailer = oApplicationDBContext.Trailers.Find(pnID);
             if (oCurrentTrailer == null)
             {
                 return HttpNotFound();
@@ -234,9 +234,9 @@ namespace ExchangeLogistixMVC.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int pnID)
         {
-            Trailer oCurrentTrailer = oTrailerDB.Trailer.Find(pnID);
-			oTrailerDB.Trailer.Remove(oCurrentTrailer);
-			oTrailerDB.SaveChanges();
+            Trailer oCurrentTrailer = oApplicationDBContext.Trailers.Find(pnID);
+			oApplicationDBContext.Trailers.Remove(oCurrentTrailer);
+			oApplicationDBContext.SaveChanges();
             return RedirectToAction("Index");
         }
 
@@ -244,7 +244,7 @@ namespace ExchangeLogistixMVC.Controllers
         {
             if (pbDisposing)
             {
-				oTrailerDB.Dispose();
+				oApplicationDBContext.Dispose();
             }
             base.Dispose(pbDisposing);
         }

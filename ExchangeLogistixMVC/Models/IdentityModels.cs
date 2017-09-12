@@ -1,6 +1,7 @@
 ﻿using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 
@@ -19,6 +20,8 @@ namespace ExchangeLogistixMVC.Models
 		
 		public string FirstName { get; set; }
 		public string LastName { get; set; }
+
+		public virtual ICollection<Trailer> Trailers { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
@@ -32,5 +35,7 @@ namespace ExchangeLogistixMVC.Models
         {
             return new ApplicationDbContext();
         }
+
+		public DbSet<Trailer> Trailers { get; set; }
     }
 }
