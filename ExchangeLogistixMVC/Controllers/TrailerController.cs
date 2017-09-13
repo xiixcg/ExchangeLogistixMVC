@@ -69,7 +69,7 @@ namespace ExchangeLogistixMVC.Controllers
 				{
 					oApplicationDBContext.Trailers.Add(poTrailer);
 					oApplicationDBContext.SaveChanges();
-					return RedirectToAction("Index");
+					return RedirectToAction("MyTrailer");
 				}
 			}
 			catch (DataException oError)
@@ -87,11 +87,9 @@ namespace ExchangeLogistixMVC.Controllers
 				return RedirectToAction("Login", "Account");
 			}
 
-			string sApplicationUserID = User.Identity.GetUserId();
-			ApplicationUser oApplicationUser = new ApplicationUser() { Id = sApplicationUserID };
+			ApplicationUser oCurrentUser = getCurrentUser();
 			IEnumerable<Trailer> oTrailerQuery =
-			from oTrailer in oApplicationUser.Trailers.ToList()
-			//where oTrailer.ApplicationUserID == sApplicationUserID
+			from oTrailer in oCurrentUser.Trailers.ToList()
 			where oTrailer.CurrentLoadETA >= DateTime.Now
 			select oTrailer;
 
@@ -105,11 +103,10 @@ namespace ExchangeLogistixMVC.Controllers
 			{
 				return RedirectToAction("Login", "Account");
 			}
-			
-			string sApplicationUserID = User.Identity.GetUserId();
+
+			ApplicationUser oCurrentUser = getCurrentUser();
 			IEnumerable<Trailer> oTrailerQuery =
-			from oTrailer in oApplicationDBContext.Trailers.ToList()
-			where oTrailer.ApplicationUserID == sApplicationUserID
+			from oTrailer in oCurrentUser.Trailers.ToList()
 			where oTrailer.CurrentLoadETA < DateTime.Now
 			select oTrailer;
 
@@ -166,7 +163,7 @@ namespace ExchangeLogistixMVC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer poTrailer)
+        public ActionResult Edit([Bind(Include = "TrailerID, ApplicationUserID, PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer poTrailer)
         {
 			try
 			{
@@ -174,7 +171,7 @@ namespace ExchangeLogistixMVC.Controllers
 				{
 					oApplicationDBContext.Entry(poTrailer).State = EntityState.Modified;
 					oApplicationDBContext.SaveChanges();
-					return RedirectToAction("Index");
+					return RedirectToAction("MyTrailer");
 				}
 			}
 			catch (DataException oError)
