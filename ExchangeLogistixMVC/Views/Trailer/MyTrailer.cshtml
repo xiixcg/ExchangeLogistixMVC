@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNet.Identity
-@model IEnumerable<ExchangeLogistixMVC.Models.Trailer>
+﻿@model IEnumerable<ExchangeLogistixMVC.Models.Trailer>
 
 @{
     ViewBag.Title = "MyTrailer";
@@ -11,12 +10,12 @@
     @Html.ActionLink("Create New", "Create")
 </p>
 <p>
-    @Html.ActionLink("Past Trailer", "PastTrailer", new { psID = User.Identity.GetUserId() })
+    @Html.ActionLink("Past Trailer", "PastTrailer")
 </p>
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.UserID)
+            @Html.DisplayNameFor(model => model.ApplicationUserID)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.PhoneNumber)
@@ -42,7 +41,7 @@
 @foreach (var item in Model) {
     <tr>
         <td>
-            @Html.DisplayFor(modelItem => item.UserID)
+            @Html.DisplayFor(modelItem => item.ApplicationUserID)
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.PhoneNumber)
@@ -63,10 +62,10 @@
             @Html.DisplayFor(modelItem => item.CurrentLoadETA)
         </td>
         <td>
-            @Html.ActionLink("Match", "ShowMatch", new { pnID = item.Id }) |
-            @Html.ActionLink("Edit", "Edit", new { pnID = item.Id }) |
-            @Html.ActionLink("Details", "Details", new { pnID = item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { pnID = item.Id })
+            @Html.ActionLink("Match", "ShowMatch", new { pnID = item.TrailerID }) |
+            @Html.ActionLink("Edit", "Edit", new { pnID = item.TrailerID }) |
+            @Html.ActionLink("Details", "Details", new { pnID = item.TrailerID }) |
+            @Html.ActionLink("Delete", "Delete", new { pnID = item.TrailerID })
         </td>
     </tr>
 }

@@ -61,50 +61,37 @@ namespace ExchangeLogistixMVC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "TrailerID, ApplicationUserID, PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer poTrailer)
+        public ActionResult Create([Bind(Include = "PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer poTrailer)
 		{
-			//string sUserID = User.Identity.GetUserId();
-
-			//if (!sUserID.Equals(null) && !sUserID.Equals(""))
-			//{
-			//	poTrailer.ApplicationUserID = sUserID;
-			//}
-
-			if (poTrailer.PhoneNumber.Equals(null) && poTrailer.PhoneNumber.Equals(""))
+			try
 			{
-				var oManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
-				var oCurrentUser = oManager.FindById(poTrailer.ApplicationUserID);
-
-				if (!oCurrentUser.Equals(null))
+				if (isAbleToSetUserIDAsApplicationUserID(poTrailer) && isAbleToSetPhonNumber(poTrailer) && ModelState.IsValid)
 				{
-					poTrailer.PhoneNumber = oCurrentUser.PhoneNumber;
+					oApplicationDBContext.Trailers.Add(poTrailer);
+					oApplicationDBContext.SaveChanges();
+					return RedirectToAction("Index");
 				}
 			}
-
-			if (ModelState.IsValid)
-            {
-				oApplicationDBContext.Trailers.Add(poTrailer);
-				oApplicationDBContext.SaveChanges();
-                return RedirectToAction("Index");
-            }
-
-            return View(poTrailer);
+			catch (DataException oError)
+			{
+				ModelState.AddModelError("", "Unable to save changes, Please try again and contact your system administrator if problem persists.");
+			}
+			return View(poTrailer);
         }
 
 		//Get: Trailer/MyTrailer
-		public ActionResult MyTrailer(string psID)
+		public ActionResult MyTrailer()
 		{
 			if (!Request.IsAuthenticated)
 			{
 				return RedirectToAction("Login", "Account");
 			}
-			if (psID == null || psID == "")
-			{
-				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-			}
+
+			string sApplicationUserID = User.Identity.GetUserId();
+			ApplicationUser oApplicationUser = new ApplicationUser() { Id = sApplicationUserID };
 			IEnumerable<Trailer> oTrailerQuery =
-			from oTrailer in oApplicationDBContext.Trailers.ToList()
-			//where oTrailer.UserID == psID
+			from oTrailer in oApplicationUser.Trailers.ToList()
+			//where oTrailer.ApplicationUserID == sApplicationUserID
 			where oTrailer.CurrentLoadETA >= DateTime.Now
 			select oTrailer;
 
@@ -112,19 +99,17 @@ namespace ExchangeLogistixMVC.Controllers
 		}
 
 		//Get: Trailer/PastTrailer
-		public ActionResult PastTrailer(string psID)
+		public ActionResult PastTrailer()
 		{
 			if (!Request.IsAuthenticated)
 			{
 				return RedirectToAction("Login", "Account");
 			}
-			if (psID == null || psID == "")
-			{
-				return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-			}
+			
+			string sApplicationUserID = User.Identity.GetUserId();
 			IEnumerable<Trailer> oTrailerQuery =
 			from oTrailer in oApplicationDBContext.Trailers.ToList()
-				//where oTrailer.UserID == psID
+			where oTrailer.ApplicationUserID == sApplicationUserID
 			where oTrailer.CurrentLoadETA < DateTime.Now
 			select oTrailer;
 
@@ -181,32 +166,21 @@ namespace ExchangeLogistixMVC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "TrailerID, ApplicationUserID, PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer poTrailer)
+        public ActionResult Edit([Bind(Include = "PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer poTrailer)
         {
-			//string sUserID = User.Identity.GetUserId();
-
-			//if (!sUserID.Equals(null) && !sUserID.Equals(""))
-			//{
-			//	poTrailer.UserID = sUserID;
-			//}
-
-			if (poTrailer.PhoneNumber.Equals(null) && poTrailer.PhoneNumber.Equals(""))
+			try
 			{
-				var oManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
-				var oCurrentUser = oManager.FindById(poTrailer.ApplicationUserID);
-
-				if (!oCurrentUser.Equals(null))
+				if (isAbleToSetPhonNumber(poTrailer) && ModelState.IsValid)
 				{
-					poTrailer.PhoneNumber = oCurrentUser.PhoneNumber;
+					oApplicationDBContext.Entry(poTrailer).State = EntityState.Modified;
+					oApplicationDBContext.SaveChanges();
+					return RedirectToAction("Index");
 				}
 			}
-
-			if (ModelState.IsValid)
-            {
-				oApplicationDBContext.Entry(poTrailer).State = EntityState.Modified;
-				oApplicationDBContext.SaveChanges();
-                return RedirectToAction("Index");
-            }
+			catch (DataException oError)
+			{
+				ModelState.AddModelError("", "Unable to save changes, Please try again and contact your system administrator if problem persists.");
+			}
             return View(poTrailer);
         }
 
@@ -248,5 +222,70 @@ namespace ExchangeLogistixMVC.Controllers
             }
             base.Dispose(pbDisposing);
         }
+
+		private bool isAbleToSetUserIDAsApplicationUserID(Trailer poTrailer)
+		{
+			string sUserID = User.Identity.GetUserId();
+			if (!sUserID.Equals(null) && !sUserID.Equals(""))
+			{
+				poTrailer.ApplicationUserID = sUserID;
+				return true;
+			}
+			return false;
+		}
+
+		private bool isAbleToSetPhonNumber(Trailer poTrailer)
+		{
+			if (!isNullOrWhiteSpace(poTrailer.PhoneNumber))
+			{
+				return true;
+			}
+
+			ApplicationUser oCurrentUser = getCurrentUser();
+			if (isSomething(oCurrentUser))
+			{
+				poTrailer.PhoneNumber = oCurrentUser.PhoneNumber;
+				return true;
+			}			
+
+			return false;
+		}
+
+		private ApplicationUser getCurrentUser()
+		{
+			string sUserID = User.Identity.GetUserId();
+			var oManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
+
+			if (oManager != null && !isNullOrWhiteSpace(sUserID))
+			{
+				return oManager.FindById(sUserID);
+			}			
+			return null;
+		}
+
+		private bool isNullOrWhiteSpace(string psString)
+		{
+			if (psString == null)
+			{
+				return true;
+			}
+
+			if (psString == "")
+			{
+				return true;
+			}
+
+			return false;
+		}
+
+		private bool isSomething(object poObject)
+		{
+			if (poObject != null)
+			{
+				return true;
+			}
+
+			return false;
+		}
     }
 }

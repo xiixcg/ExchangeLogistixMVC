@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNet.Identity
-@model IEnumerable<ExchangeLogistixMVC.Models.Trailer>
+﻿@model IEnumerable<ExchangeLogistixMVC.Models.Trailer>
 
 @{
     ViewBag.Title = "ShowMatch";
@@ -8,12 +7,12 @@
 <h2>Match</h2>
 
 <p>
-    @Html.ActionLink("Return to My Trailer", "MyTrailer", new { psID = User.Identity.GetUserId() })
+    @Html.ActionLink("Return to My Trailer", "MyTrailer")
 </p>
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.UserID)
+            @Html.DisplayNameFor(model => model.ApplicationUserID)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.PhoneNumber)
@@ -39,7 +38,7 @@
 @foreach (var item in Model) {
     <tr>
         <td>
-            @Html.DisplayFor(modelItem => item.UserID)
+            @Html.DisplayFor(modelItem => item.ApplicationUserID)
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.PhoneNumber)
