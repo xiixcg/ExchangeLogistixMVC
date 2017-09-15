@@ -17,14 +17,27 @@ namespace ExchangeLogistixMVC.Controllers
         private ApplicationDbContext oApplicationDBContext = new ApplicationDbContext();
 		
         // GET: Trailer
-        public ActionResult Index()
-        {
+        public ActionResult Index(string sortOrder)
+        {		
 			if (!Request.IsAuthenticated)
 			{
 				return RedirectToAction("Login", "Account");
 			}
 
-            return View(oApplicationDBContext.Trailers.ToList());
+			ViewBag.DateSortParm = String.IsNullOrEmpty (sortOrder) ? "date_desc" : "";
+			IQueryable<Trailer> oTrailers = from oTrailer in oApplicationDBContext.Trailers
+							select oTrailer;
+			switch (sortOrder)
+			{
+				case "date_desc":
+					oTrailers = oTrailers.OrderByDescending (oTrailer => oTrailer.CurrentLoadETA);
+					break;
+				default:
+					oTrailers = oTrailers.OrderBy (oTrailer => oTrailer.CurrentLoadETA);
+					break;
+			}
+				
+				return View(oTrailers.ToList());
         }
 
         // GET: Trailer/Details/5
@@ -80,20 +93,20 @@ namespace ExchangeLogistixMVC.Controllers
         }
 
 		//Get: Trailer/MyTrailer
-		public ActionResult MyTrailer()
+		public ActionResult MyTrailer(string sortOrder)
 		{
 			if (!Request.IsAuthenticated)
 			{
 				return RedirectToAction("Login", "Account");
 			}
-
+			
 			ApplicationUser oCurrentUser = getCurrentUser();
 			IEnumerable<Trailer> oTrailerQuery =
-			from oTrailer in oCurrentUser.Trailers.ToList()
+			from oTrailer in oCurrentUser.Trailers
 			where oTrailer.CurrentLoadETA >= DateTime.Now
 			select oTrailer;
-
-			return View(oTrailerQuery);
+			
+			return View(oTrailerQuery.ToList());
 		}
 
 		//Get: Trailer/PastTrailer
@@ -106,11 +119,11 @@ namespace ExchangeLogistixMVC.Controllers
 
 			ApplicationUser oCurrentUser = getCurrentUser();
 			IEnumerable<Trailer> oTrailerQuery =
-			from oTrailer in oCurrentUser.Trailers.ToList()
+			from oTrailer in oCurrentUser.Trailers
 			where oTrailer.CurrentLoadETA < DateTime.Now
 			select oTrailer;
 
-			return View(oTrailerQuery);
+			return View(oTrailerQuery.ToList());
 		}
 
 		//Get: Trailer/ShowMatch
@@ -130,13 +143,13 @@ namespace ExchangeLogistixMVC.Controllers
 				return HttpNotFound();
 			}
 			IEnumerable<Trailer> oTrailerQuery = 
-			from oTrailer in oApplicationDBContext.Trailers.ToList() 
+			from oTrailer in oApplicationDBContext.Trailers 
 			where oTrailer.NextLoadLocation == oCurrentTrailer.CurrentLoadDestination
 			where oTrailer.CurrentLoadETA == oCurrentTrailer.CurrentLoadETA
 			where oTrailer.ApplicationUserID != oCurrentTrailer.ApplicationUserID
 			select oTrailer;
 
-			return View(oTrailerQuery);
+			return View(oTrailerQuery.ToList());
 		}
 
 		// GET: Trailer/Edit/5
