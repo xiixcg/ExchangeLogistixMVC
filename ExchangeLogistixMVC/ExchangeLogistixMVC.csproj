@@ -280,7 +280,6 @@
     <Content Include="Views\Trailer\Delete.cshtml" />
     <Content Include="Views\Trailer\Details.cshtml" />
     <Content Include="Views\Trailer\Edit.cshtml" />
-    <Content Include="Views\Trailer\Index.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Trailer\ShowMatch.cshtml" />
     <Content Include="Views\Trailer\MyTrailer.cshtml" />

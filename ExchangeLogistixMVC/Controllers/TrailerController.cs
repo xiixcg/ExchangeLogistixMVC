@@ -15,31 +15,6 @@ namespace ExchangeLogistixMVC.Controllers
     public class TrailerController : Controller
     {
         private ApplicationDbContext oApplicationDBContext = new ApplicationDbContext();
-		
-        // GET: Trailer
-        public ActionResult Index(string psSortOrder)
-        {		
-			if (!Request.IsAuthenticated)
-			{
-				return RedirectToAction("Login", "Account");
-			}
-
-			ViewBag.DateSortParm = String.IsNullOrEmpty(psSortOrder) ? "date_desc" : "";
-
-			IQueryable<Trailer> oTrailers = from oTrailer in oApplicationDBContext.Trailers
-							select oTrailer;
-			switch (psSortOrder)
-			{
-				case "date_desc":
-					oTrailers = oTrailers.OrderByDescending(oTrailer => oTrailer.CurrentLoadETA);
-					break;
-				default:
-					oTrailers = oTrailers.OrderBy(oTrailer => oTrailer.CurrentLoadETA);
-					break;
-			}
-				
-				return View(oTrailers.ToList());
-        }
 
         // GET: Trailer/Details/5
         public ActionResult Details(int? pnID)
