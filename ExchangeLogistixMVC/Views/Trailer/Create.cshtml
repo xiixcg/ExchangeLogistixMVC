@@ -27,7 +27,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.ChasisSize, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.ChasisSize, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EnumDropDownListFor(model => model.ChasisSize, htmlAttributes: new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.ChasisSize, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -35,7 +35,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.LoadSize, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.LoadSize, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EnumDropDownListFor(model => model.LoadSize, htmlAttributes: new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.LoadSize, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -43,7 +43,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.NextLoadLocation, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.NextLoadLocation, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EnumDropDownListFor(model => model.NextLoadLocation, htmlAttributes: new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.NextLoadLocation, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -51,7 +51,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.CurrentLoadDestination, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.CurrentLoadDestination, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EnumDropDownListFor(model => model.CurrentLoadDestination, htmlAttributes: new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.CurrentLoadDestination, "", new { @class = "text-danger" })
             </div>
         </div>

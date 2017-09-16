@@ -17,23 +17,24 @@ namespace ExchangeLogistixMVC.Controllers
         private ApplicationDbContext oApplicationDBContext = new ApplicationDbContext();
 		
         // GET: Trailer
-        public ActionResult Index(string sortOrder)
+        public ActionResult Index(string psSortOrder)
         {		
 			if (!Request.IsAuthenticated)
 			{
 				return RedirectToAction("Login", "Account");
 			}
 
-			ViewBag.DateSortParm = String.IsNullOrEmpty (sortOrder) ? "date_desc" : "";
+			ViewBag.DateSortParm = String.IsNullOrEmpty(psSortOrder) ? "date_desc" : "";
+
 			IQueryable<Trailer> oTrailers = from oTrailer in oApplicationDBContext.Trailers
 							select oTrailer;
-			switch (sortOrder)
+			switch (psSortOrder)
 			{
 				case "date_desc":
-					oTrailers = oTrailers.OrderByDescending (oTrailer => oTrailer.CurrentLoadETA);
+					oTrailers = oTrailers.OrderByDescending(oTrailer => oTrailer.CurrentLoadETA);
 					break;
 				default:
-					oTrailers = oTrailers.OrderBy (oTrailer => oTrailer.CurrentLoadETA);
+					oTrailers = oTrailers.OrderBy(oTrailer => oTrailer.CurrentLoadETA);
 					break;
 			}
 				
@@ -78,7 +79,10 @@ namespace ExchangeLogistixMVC.Controllers
 		{
 			try
 			{
-				if (isAbleToSetUserIDAsApplicationUserID(poTrailer) && isAbleToSetPhonNumber(poTrailer) && ModelState.IsValid)
+				setCreatedDateTime(poTrailer);
+				if (isAbleToSetUserIDAsApplicationUserID(poTrailer) 
+					&& isAbleToSetPhonNumber(poTrailer) 
+					&& ModelState.IsValid)
 				{
 					oApplicationDBContext.Trailers.Add(poTrailer);
 					oApplicationDBContext.SaveChanges();
@@ -93,35 +97,59 @@ namespace ExchangeLogistixMVC.Controllers
         }
 
 		//Get: Trailer/MyTrailer
-		public ActionResult MyTrailer(string sortOrder)
+		public ActionResult MyTrailer(string psSortOrder)
 		{
 			if (!Request.IsAuthenticated)
 			{
 				return RedirectToAction("Login", "Account");
 			}
-			
+
+			ViewBag.DateSortParm = String.IsNullOrEmpty(psSortOrder) ? "date_desc" : "";
 			ApplicationUser oCurrentUser = getCurrentUser();
+
 			IEnumerable<Trailer> oTrailerQuery =
 			from oTrailer in oCurrentUser.Trailers
 			where oTrailer.CurrentLoadETA >= DateTime.Now
 			select oTrailer;
+
+			switch (psSortOrder)
+			{
+				case "date_desc":
+					oTrailerQuery = oTrailerQuery.OrderByDescending(oTrailer => oTrailer.CurrentLoadETA);
+					break;
+				default:
+					oTrailerQuery = oTrailerQuery.OrderBy(oTrailer => oTrailer.CurrentLoadETA);
+					break;
+			}			
 			
 			return View(oTrailerQuery.ToList());
 		}
 
 		//Get: Trailer/PastTrailer
-		public ActionResult PastTrailer()
+		public ActionResult PastTrailer(string psSortOrder)
 		{
 			if (!Request.IsAuthenticated)
 			{
 				return RedirectToAction("Login", "Account");
 			}
 
+			ViewBag.DateSortParm = String.IsNullOrEmpty(psSortOrder) ? "date_desc" : "";
 			ApplicationUser oCurrentUser = getCurrentUser();
+
 			IEnumerable<Trailer> oTrailerQuery =
 			from oTrailer in oCurrentUser.Trailers
 			where oTrailer.CurrentLoadETA < DateTime.Now
 			select oTrailer;
+
+			switch (psSortOrder)
+			{
+				case "date_desc":
+					oTrailerQuery = oTrailerQuery.OrderByDescending(oTrailer => oTrailer.CurrentLoadETA);
+					break;
+				default:
+					oTrailerQuery = oTrailerQuery.OrderBy(oTrailer => oTrailer.CurrentLoadETA);
+					break;
+			}
 
 			return View(oTrailerQuery.ToList());
 		}
@@ -176,7 +204,7 @@ namespace ExchangeLogistixMVC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "TrailerID, ApplicationUserID, PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA")] Trailer poTrailer)
+        public ActionResult Edit([Bind(Include = "TrailerID, ApplicationUserID, PhoneNumber,ChasisSize,LoadSize,NextLoadLocation,CurrentLoadDestination,CurrentLoadETA,CreatedDateTime")] Trailer poTrailer)
         {
 			try
 			{
@@ -188,8 +216,8 @@ namespace ExchangeLogistixMVC.Controllers
 				}
 			}
 			catch (DataException oError)
-			{
-				ModelState.AddModelError("", "Unable to save changes, Please try again and contact your system administrator if problem persists.");
+			{ 
+				ModelState.AddModelError("", "Unable to save changes, Please try again and contact your system administrator if problem persists." + poTrailer.CreatedDateTime + poTrailer.ApplicationUserID);
 			}
             return View(poTrailer);
         }
@@ -218,10 +246,10 @@ namespace ExchangeLogistixMVC.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int pnID)
         {
-            Trailer oCurrentTrailer = oApplicationDBContext.Trailers.Find(pnID);
-			oApplicationDBContext.Trailers.Remove(oCurrentTrailer);
+			Trailer oTrailerToDelete = new Trailer () { TrailerID = pnID };
+			oApplicationDBContext.Entry(oTrailerToDelete).State = EntityState.Deleted;
 			oApplicationDBContext.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("MyTrailer");
         }
 
         protected override void Dispose(bool pbDisposing)
@@ -236,7 +264,7 @@ namespace ExchangeLogistixMVC.Controllers
 		private bool isAbleToSetUserIDAsApplicationUserID(Trailer poTrailer)
 		{
 			string sUserID = User.Identity.GetUserId();
-			if (!sUserID.Equals(null) && !sUserID.Equals(""))
+			if (!isNullOrWhiteSpace(sUserID))
 			{
 				poTrailer.ApplicationUserID = sUserID;
 				return true;
@@ -259,6 +287,11 @@ namespace ExchangeLogistixMVC.Controllers
 			}			
 
 			return false;
+		}
+
+		private void setCreatedDateTime(Trailer poTrailer )
+		{
+			poTrailer.CreatedDateTime = DateTime.Now;
 		}
 
 		private ApplicationUser getCurrentUser()

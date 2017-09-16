@@ -30,7 +30,7 @@
             @Html.DisplayNameFor(model => model.CurrentLoadDestination)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.CurrentLoadETA)
+            @Html.ActionLink("Current Load ETA", "Index", new { psSortOrder = ViewBag.DateSortParm })
         </th>
         <th></th>
     </tr>
