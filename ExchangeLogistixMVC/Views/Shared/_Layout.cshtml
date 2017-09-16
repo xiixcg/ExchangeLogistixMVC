@@ -28,9 +28,6 @@
                     }
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                    @if (Request.IsAuthenticated)
-                    {
-                    <li>@Html.ActionLink("AllTrailer", "Index", "Trailer")</li>}
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>
