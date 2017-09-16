@@ -15,7 +15,7 @@ namespace ExchangeLogistixMVC.Controllers
     public class TrailerController : Controller
     {
         private ApplicationDbContext oApplicationDBContext = new ApplicationDbContext();
-
+		
         // GET: Trailer/Details/5
         public ActionResult Details(int? pnID)
         {
